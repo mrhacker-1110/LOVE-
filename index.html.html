@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ширин, это тебе</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Marck+Script&display=swap" rel="stylesheet">
+<style>
+:root{
+  --wine:#2a0f1e; --plum:#4a1730; --rose:#e8a0b4; --ivory:#fbeee6; --gold:#d9b382; --ember:#8c2347;
+  color-scheme: dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--wine:#2a0f1e;--ivory:#fbeee6}}
+:root[data-theme="dark"]{--wine:#2a0f1e;--ivory:#fbeee6}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:radial-gradient(120% 80% at 50% 0%,var(--plum) 0%,var(--wine) 60%) fixed var(--wine);
+  color:var(--ivory);
+  font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  font-size:1.3rem;line-height:1.6;
+  display:flex;justify-content:center;
+}
+main{width:100%;max-width:34rem;padding:2.5rem 1.5rem 4rem;text-align:center;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.name{font-family:"Marck Script","Segoe Script",cursive;font-size:clamp(3.6rem,17vw,5.6rem);line-height:1;color:var(--rose);margin:0 0 .4rem;text-shadow:0 0 30px rgba(232,160,180,.35)}
+.sub{margin:0 0 2.2rem;font-style:italic;color:var(--gold)}
+.seal{
+  width:7.5rem;height:7.5rem;margin:0 auto;border:0;border-radius:50%;cursor:pointer;
+  background:radial-gradient(circle at 35% 30%,#c23a66,var(--ember) 60%,#5c1230);
+  color:var(--ivory);font:600 1.15rem "Cormorant Garamond",Georgia,serif;
+  box-shadow:0 0 0 6px rgba(140,35,71,.25),0 10px 40px rgba(194,58,102,.5);
+  animation:beat 2.4s ease-in-out infinite;
+}
+.seal:focus-visible,.btn:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+#letter{display:none;text-align:left}
+#letter.on{display:block}
+#letter p{margin:0 0 1.15rem;opacity:0;transform:translateY(8px);transition:opacity .9s,transform .9s}
+#letter p.show{opacity:1;transform:none}
+.sign{font-family:"Marck Script","Segoe Script",cursive;font-size:1.9rem;color:var(--rose);text-align:right}
+#ask{display:none;text-align:center;margin-top:1.2rem}
+#ask.on{display:block}
+#ask h2{font-family:"Marck Script","Segoe Script",cursive;font-weight:400;font-size:2.3rem;color:var(--ivory);margin:0 0 1.2rem}
+.row{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;min-height:4rem}
+.btn{border:1px solid var(--rose);background:transparent;color:var(--ivory);font:600 1.15rem "Cormorant Garamond",Georgia,serif;padding:.8rem 1.8rem;border-radius:2rem;cursor:pointer}
+.btn.yes{background:var(--ember);border-color:var(--ember);box-shadow:0 6px 24px rgba(194,58,102,.45)}
+#done{display:none;margin-top:1rem}
+#done.on{display:block}
+#done .big{font-family:"Marck Script","Segoe Script",cursive;font-size:2.6rem;color:var(--rose);margin:0 0 .5rem}
+canvas{position:fixed;inset:0;pointer-events:none;width:100%;height:100%}
+@media (prefers-reduced-motion:reduce){.seal{animation:none}#letter p{transition:none}}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<audio id="song" src="song.mp3" loop preload="auto"></audio>
+<main>
+  <section id="intro">
+    <h1 class="name">Ширин</h1>
+    <p class="sub">это письмо только для тебя</p>
+    <button class="seal" id="seal" type="button">Открой</button>
+  </section>
+
+  <section id="letter" aria-live="polite">
+    <p>Ширин, привет. Это не длинное письмо и не попытка что-то потребовать. Я просто хочу, чтобы тебе стало немного приятнее сегодня.</p>
+    <p>Я заметил, что мы стали общаться меньше и ты стала держаться холоднее. Если я чем-то задел тебя или был невнимательным, даже не заметив этого, прости меня. Правда.</p>
+    <p>Ты ничего не обязана мне отвечать. Я просто хочу, чтобы ты знала: ты хороший человек, и мне дорого, что ты есть в моей жизни.</p>
+    <p>Я не буду давить. Но если когда-нибудь захочешь снова поговорить, я буду рад. Просто напиши мне, хоть одно слово.</p>
+    <p class="sign">Твой Кудайберген</p>
+  </section>
+
+  <section id="ask">
+    <h2>Можно я иногда буду тебе писать?</h2>
+    <div class="row" id="row">
+      <button class="btn yes" id="yes" type="button">Можно</button>
+      <button class="btn" id="no" type="button">Пока не надо</button>
+    </div>
+  </section>
+
+  <section id="done">
+    <p class="big" id="doneBig">Спасибо, Ширин</p>
+    <p id="doneTxt">Мне очень приятно. Я буду писать аккуратно и только когда это уместно.</p>
+    <a class="btn yes" id="wa" href="#" target="_blank" rel="noopener" style="display:none;text-decoration:none;margin-top:.6rem">Написать ему</a>
+  </section>
+</main>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  // ДОПИШИ СВОЙ НОМЕР: только цифры, без плюса и пробелов (996706 + остальные цифры)
+  var MY_NUMBER='996706424063';
+  var seal=$('seal'),letter=$('letter'),ask=$('ask'),done=$('done');
+
+  seal.addEventListener('click',function(){
+    var a=$('song');if(a){a.play().catch(function(){})}
+    $('intro').style.display='none';
+    letter.classList.add('on');
+    var ps=letter.querySelectorAll('p');
+    ps.forEach(function(p,i){setTimeout(function(){p.classList.add('show')},i*1500)});
+    setTimeout(function(){ask.classList.add('on');ask.scrollIntoView({behavior:'smooth',block:'center'})},ps.length*1500+400);
+  });
+
+  $('no').addEventListener('click',function(){
+    ask.style.display='none';
+    $('doneBig').textContent='Спасибо, что дочитала';
+    $('doneTxt').textContent='Я всё понимаю и никуда не тороплю. Хорошего тебе дня, Ширин.';
+    done.classList.add('on');
+  });
+
+  $('yes').addEventListener('click',function(){
+    ask.style.display='none';
+    done.classList.add('on');
+    var wa=$('wa');
+    wa.href='https://wa.me/'+MY_NUMBER+'?text='+encodeURIComponent('Привет! Я прочитала твоё письмо. Можно 🙂');
+    wa.style.display='inline-block';
+    burst();
+  });
+
+  var cv=$('fx'),ctx=cv.getContext('2d'),hearts=[],raf;
+  function size(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio}
+  size();addEventListener('resize',size);
+  function burst(){
+    var d=devicePixelRatio,reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+    for(var i=0;i<(reduce?20:90);i++){
+      hearts.push({x:Math.random()*cv.width,y:cv.height+Math.random()*cv.height*.4,
+        s:(10+Math.random()*22)*d,v:(1.5+Math.random()*3)*d,w:Math.random()*Math.PI*2,
+        c:['#e8a0b4','#c23a66','#fbeee6','#d9b382'][i%4]});
+    }
+    if(!raf)loop();
+  }
+  function heart(x,y,s,c){
+    ctx.fillStyle=c;ctx.beginPath();
+    ctx.moveTo(x,y+s*.3);
+    ctx.bezierCurveTo(x,y-s*.2,x-s*.6,y-s*.2,x-s*.6,y+s*.3);
+    ctx.bezierCurveTo(x-s*.6,y+s*.65,x,y+s*.9,x,y+s*1.1);
+    ctx.bezierCurveTo(x,y+s*.9,x+s*.6,y+s*.65,x+s*.6,y+s*.3);
+    ctx.bezierCurveTo(x+s*.6,y-s*.2,x,y-s*.2,x,y+s*.3);
+    ctx.fill();
+  }
+  function loop(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    hearts=hearts.filter(function(h){return h.y>-60});
+    hearts.forEach(function(h){h.y-=h.v;h.w+=.03;heart(h.x+Math.sin(h.w)*20,h.y,h.s,h.c)});
+    raf=hearts.length?requestAnimationFrame(loop):0;
+  }
+})();
+</script>
+</body>
+</html>
